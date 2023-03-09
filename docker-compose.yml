@@ -24,7 +24,11 @@ services:
       context: .
       target: api
     environment:
-      - DATABASE_URI="postgresql+psycopg2://postgres:postgres@db:5432/employees"
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=employees
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     volumes:
       - "./data:/data"
     entrypoint: ["python", "/app/api/entrypoint.py"]
@@ -46,6 +50,8 @@ services:
   minio:
     image: minio/minio
     restart: always
+    depends_on:
+      - api
     environment:
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio
@@ -61,6 +67,7 @@ services:
     depends_on:
       - db
       - minio
+      - api
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

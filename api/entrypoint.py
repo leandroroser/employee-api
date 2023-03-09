@@ -22,6 +22,12 @@ def create_tables(connector):
     Base.metadata.create_all(bind=connector.db_session.bind)
 
 if __name__ == "__main__":
+    user=os.environ["POSTGRES_USER"]
+    password=os.environ["POSTGRES_PASSWORD"]
+    host=os.environ["POSTGRES_HOST"]
+    port=os.environ["POSTGRES_PORT"]
+    db=os.environ["POSTGRES_DB"]
+    DATABASE_URI=f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
     db_uri = os.environ["DATABASE_URI"]
     engine = create_engine(db_uri)
     connector = Connector(engine)

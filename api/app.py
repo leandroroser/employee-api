@@ -7,7 +7,7 @@ from schemas import Employee, Department, Job
 from app.connector import Connector
 
 
-app = FastAPI(title="mployee management system")
+app = FastAPI(title="Employee management system")
 
 app.add_middleware(
     CORSMiddleware,
