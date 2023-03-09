@@ -17,7 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.get("/status", tags=["status"])
 def status() -> JSONResponse:
     return {"status": "I am up"}
@@ -30,7 +29,6 @@ async def read_table(table: str):
     connector = Connector(globals()[table.capitalize()])
     rows = connector.read_all()
     return rows
-
 
 @app.post("/{table}", tags=["table"])
 async def create_table(table: str, rows: List[dict]):
@@ -45,9 +43,11 @@ async def create_table(table: str, rows: List[dict]):
 async def put_table(table: str, rows: List[dict]):
     raise HTTPException(status_code=405, detail="Not allowed response")
 
+
 @app.delete("/{table}", tags=["table"])
 async def delete_table(table: str, rows: List[dict]):
     raise HTTPException(status_code=405, detail="Not allowed response")
+
 
 
 @app.get("/restore_data/{table}/{date}")
