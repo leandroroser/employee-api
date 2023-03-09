@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from api.src.models import Employee, Job, Department
 from api.src.schema import Base
 from api.src.connector import Connector
+from data_generator import generate_employee_csv,generate_job_csv,generate_department_csv
 
 def read_csv_file(file_path):
     return pd.read_csv(file_path)
@@ -24,6 +25,10 @@ if __name__ == "__main__":
     db_uri = os.environ["DATABASE_URI"]
     engine = create_engine(db_uri)
     connector = Connector(engine)
+
+    generate_employee_csv("./data/employee.csv")
+    generate_job_csv("./data/job.csv")
+    generate_department_csv("./data/department.csv")
 
     create_tables(connector)
     create_table(connector, "employee", Employee)

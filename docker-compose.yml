@@ -26,10 +26,9 @@ services:
     volumes:
       - "./data:/data"
     command: >
-      bash -c "export PYTHONPATH=/app/api &&
+      bash -c "export PYTHONPATH=/app &&
              python -m entrypoint &&
              uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
-    env_file: .env
     ports:
       - 8000:8000
     links:

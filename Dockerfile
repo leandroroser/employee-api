@@ -18,6 +18,7 @@ FROM base as api
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.api.txt
 COPY ./api api
+COPY entrypoint.py .
 COPY ./data api/data
 
 
