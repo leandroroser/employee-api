@@ -1,0 +1,1 @@
+$CRON_SCHEDULE root python /app/backup_tables_to_minio.py
