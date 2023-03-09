@@ -6,8 +6,6 @@ from datetime import date
 from schemas import Employee, Department, Job
 from app.connector import Connector
 
-description = """
-"""
 
 app = FastAPI(title="mployee management system")
 
