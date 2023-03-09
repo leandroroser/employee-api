@@ -51,29 +51,21 @@ services:
     ports:
       - 9000:9000
     volumes:
-      - minio_data:/data
+      - ./minio_data:/data
 
   backup:
     build:
       context: .
       target: backup
-      depends_on:
-        - postgres
-        - minio
-      volumes:
-        - backup_scripts:/scripts
-      environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: employees
-        MINIO_ENDPOINT: http://minio:9000
-        MINIO_ACCESS_KEY: minio
-        MINIO_SECRET_KEY: minio
-        BACKUP_BUCKET: backups
-        BACKUP_SCHEDULE: "0 */6 * * *"
-
-volumes:
-  cache:
-    driver: local
-  db:
-    driver: local
+    depends_on:
+      - db
+      - minio
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: employees
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio
+      BACKUP_BUCKET: backups
+      BACKUP_SCHEDULE: "0 */6 * * *"
