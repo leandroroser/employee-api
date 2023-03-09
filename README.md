@@ -26,6 +26,12 @@ Each endpoint supports the following methods:
 - `PUT` - updates an existing record
 - `DELETE` - deletes an existing record
 
+2. Generate data:
+
+```bash
+cd employee-management-system
+python -m data_generator
+```
 
 ### Examples
 

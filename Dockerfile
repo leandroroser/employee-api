@@ -17,13 +17,11 @@ FROM base as api
 
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
-COPY ./api api
-COPY ./data api/data
+COPY ./api /app/api
+COPY ./data /app/data
 
 
 FROM base as backup
-
-WORKDIR /app
 
 RUN apt-get update && \
     apt-get install -y cron && \
@@ -31,7 +29,7 @@ RUN apt-get update && \
 
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
-COPY ./api api
+COPY ./api /app/api
 
 COPY crontab /etc/cron.d/backup-cron
 RUN chmod 0644 /etc/cron.d/backup-cron

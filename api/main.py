@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
-from pydantic import JSONResponse
+from fastapi.responses import JSONResponse
 from datetime import date
-from schemas import Employee, Department, Job
-from app.connector import Connector
+from .src.models import Employee, Department, Job
+from .src.connector import Connector
+import uvicorn
 
 
 app = FastAPI(title="Employee management system")
@@ -57,3 +58,8 @@ async def restore_data(table: str, date: date):
     connector = Connector(globals()[table.capitalize()])
     connector.restore_from_avro(table, date)
     return {"message": f"{table} data for {date} has been restored successfully"}
+
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

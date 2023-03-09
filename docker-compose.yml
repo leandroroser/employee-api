@@ -31,11 +31,12 @@ services:
       - POSTGRES_DB=employees
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
+      - LOCAL_DATA_PATH=/app/data
     volumes:
-      - api-data:/data
-    entrypoint: ["python", "/app/api/entrypoint.py"]
+      - api-data:/app/data
+    #entrypoint: ["python", "/app/api/entrypoint.py"]
     command: >
-      bash -c "uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
+      bash -c "uvicorn api.main:app --port 8000 --host 0.0.0.0"
     ports:
       - 8000:8000
     links:
