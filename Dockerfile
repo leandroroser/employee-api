@@ -16,7 +16,7 @@ WORKDIR /app
 FROM base as api
 
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.api.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 COPY ./api api
 COPY management/entrypoint.py .
 COPY ./data api/data
@@ -31,7 +31,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.api.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 COPY ./api api
 COPY ./management management
 
