@@ -42,9 +42,11 @@ async def create_table(table: str, rows: List[dict]):
     connector.write(rows)
 
 @app.put("/{table}", tags=["table"])
+async def put_table(table: str, rows: List[dict]):
     raise HTTPException(status_code=405, detail="Not allowed response")
 
 @app.delete("/{table}", tags=["table"])
+async def delete_table(table: str, rows: List[dict]):
     raise HTTPException(status_code=405, detail="Not allowed response")
 
 
