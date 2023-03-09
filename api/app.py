@@ -9,14 +9,7 @@ from app.connector import Connector
 description = """
 """
 
-tags_metadata = [
-    {
-        "name": "employee",
-        "description": ""
-    },
-]
-
-app = FastAPI(title="employee", openapi_tags=tags_metadata)
+app = FastAPI(title="mployee management system")
 
 app.add_middleware(
     CORSMiddleware,
