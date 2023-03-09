@@ -50,6 +50,12 @@ async def create_table(table: str, rows: List[dict]):
     connector = Connector(globals()[table.capitalize()])
     connector.write(rows)
 
+@app.put("/{table}", tags=["table"])
+    raise HTTPException(status_code=405, detail="Not allowed response")
+
+@app.delete("/{table}", tags=["table"])
+    raise HTTPException(status_code=405, detail="Not allowed response")
+
 
 @app.get("/restore_data/{table}/{date}")
 async def restore_data(table: str, date: date):
