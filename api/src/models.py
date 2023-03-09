@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional,Dict
 from pydantic import BaseModel
 
+PayloadDict = Dict[str, Any]
 
 class BaseOrmModel(BaseModel):
     id: Optional[int]
