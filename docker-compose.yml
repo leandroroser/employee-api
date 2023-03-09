@@ -25,10 +25,9 @@ services:
       target: api
     volumes:
       - "./data:/data"
+    entrypoint: ["python", "entrypoint.py"]
     command: >
-      bash -c "export PYTHONPATH=/app &&
-             python -m entrypoint &&
-             uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
+      bash -c "uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
     ports:
       - 8000:8000
     links:

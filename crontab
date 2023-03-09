@@ -1,1 +1,1 @@
-$CRON_SCHEDULE root python /app/backup_tables_to_minio.py
+$CRON_SCHEDULE root python /app/management/backup_tables_to_minio.py
