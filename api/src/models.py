@@ -1,4 +1,4 @@
-from typing import Optional,Dict
+from typing import Optional,Dict,Any
 from pydantic import BaseModel
 
 PayloadDict = Dict[str, Any]
@@ -14,18 +14,18 @@ class BaseOrmModel(BaseModel):
         return self.dict(by_alias=False)
 
 
-class Employee(BaseOrmMode):
+class Employee(BaseOrmModel):
     name: str
     age: int
     job_id: int
     department_id: int
 
 
-class Department(BaseOrmMode):
+class Department(BaseOrmModel):
     name: str
     location: str
 
 
-class Job(BaseOrmMode):
+class Job(BaseOrmModel):
     title: str
     salary: int

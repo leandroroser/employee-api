@@ -18,7 +18,6 @@ FROM base as api
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 COPY ./api api
-COPY management/entrypoint.py .
 COPY ./data api/data
 
 
@@ -33,7 +32,6 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 COPY ./api api
-COPY ./management management
 
 COPY crontab /etc/cron.d/backup-cron
 RUN chmod 0644 /etc/cron.d/backup-cron

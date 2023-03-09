@@ -1,11 +1,16 @@
+certifi==2022.12.7
 Faker==17.6.0
+fastavro==1.7.3
 greenlet==2.0.2
+minio==7.1.13
 numpy==1.24.2
 pandas==1.5.3
 pi==0.1.2
+psycopg2==2.9.5
 pydantic==1.10.6
 python-dateutil==2.8.2
 pytz==2022.7.1
 six==1.16.0
 SQLAlchemy==2.0.5.post1
 typing_extensions==4.5.0
+urllib3==1.26.14

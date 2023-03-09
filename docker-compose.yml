@@ -23,9 +23,11 @@ services:
     build:
       context: .
       target: api
+    environment:
+      - DATABASE_URI="postgresql+psycopg2://postgres:postgres@db:5432/employees"
     volumes:
       - "./data:/data"
-    entrypoint: ["python", "entrypoint.py"]
+    entrypoint: ["python", "/app/api/entrypoint.py"]
     command: >
       bash -c "uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
     ports:

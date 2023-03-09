@@ -2,9 +2,9 @@ import os
 import pandas as pd
 from datetime import datetime
 from sqlalchemy import create_engine
-from api.src.models import Employee, Job, Department
-from api.src.schema import Base
-from api.src.connector import Connector
+from src.models import Employee, Job, Department
+from src.schemas import Base
+from src.connector import Connector
 from data_generator import generate_employee_csv,generate_job_csv,generate_department_csv
 
 def read_csv_file(file_path):

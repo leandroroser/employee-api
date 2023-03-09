@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from typing import Type, List
-from models import BaseOrmModel
+from typing import Type, List,TypeVar,Generic
+from .models import BaseOrmModel
 from .schemas import Base
 from fastavro import reader, parse_schema
 from io import BytesIO
