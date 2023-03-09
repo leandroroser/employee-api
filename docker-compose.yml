@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  db:
+    restart: always
+    image: postgres:14.1-alpine
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+    ports:
+      - 5432:5432  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      target: api
+    volumes:
+      - "./data:/data"
+    command: >
+      bash -c "export PYTHONPATH=/app/api &&
+             python -m entrypoint &&
+             uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
+    env_file: .env
+    ports:
+      - 8000:8000
+    links:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  cache:
+    driver: local
+  db:
+    driver: local
