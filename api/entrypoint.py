@@ -21,7 +21,8 @@ def create_table(engine, entity, domain):
     print(f"Creating {table_name}s...")
     table = read_csv_file(f"{local_data_path}/{table_name}.csv")
     for _, row in table.iterrows():
-        record = entity(**row.to_dict())
+        record = domain(**row.to_dict())
+        print(record)
         connector.write(record)
 
 def create_tables(connector):

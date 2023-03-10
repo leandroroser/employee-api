@@ -22,7 +22,7 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
         return self.domain.from_orm(entity)
 
     def convert_domain_to_db(self, domain: BaseOrmModelT) -> BaseT:
-        return self.entity(**domain.dict_for_model)
+        return self.entity(**domain.dict())
 
     def write(self, obj: BaseOrmModelT):
         db_obj = self.convert_domain_to_db(obj)
