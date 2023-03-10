@@ -60,9 +60,18 @@ make start
 To create a new employee, make a `POST` request to the `/employees` endpoint with the following payload:
 
 ```bash
-$ curl -X POST -H "Content-Type: application/json" \
--d '{"employee_id": 10001, "first_name": "John", "last_name": "Doe", "email": "johndoe@example.com", "hire_date": "2022-04-01", "job_id": "SA_MAN", "salary": 10000.0, "department_id": 80}' \
-http://localhost:8000/employees
+$ curl -X 'POST' \
+  'http://0.0.0.0:8000/employees' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '[
+    {
+    "name": "John Doe",
+    "datetime": "1980-10-16T04:36:04+00:00",
+    "job_id": 1,
+    "department_id": 3
+    }
+]'
 ```
 
 ###  Backup and Restoration
