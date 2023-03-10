@@ -1,22 +1,21 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Department(Base):
+class Departments(Base):
     __tablename__ = "departments"
     id = Column(Integer, primary_key=True, index=True)
-    department_id = Column(String, index=True)
+    department = Column(String, index=True)
 
 
-class Job(Base):
+class Jobs(Base):
     __tablename__ = "jobs"
     id = Column(Integer, primary_key=True, index=True)
     job = Column(String, index=True)
 
 
-class Employee(Base):
+class Employees(Base):
     __tablename__ = "employees"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)

@@ -12,8 +12,7 @@ class BaseOrmModel(BaseModel):
     def dict_for_model(self) -> PayloadDict:
         return self.dict(by_alias=False)
 
-
-class Employee(BaseOrmModel):
+class Employees(BaseOrmModel):
     id: Optional[int]
     name: str
     datetime: datetime
@@ -21,10 +20,11 @@ class Employee(BaseOrmModel):
     department_id: int
 
 
-class Department(BaseOrmModel):
+class Departments(BaseOrmModel):
     id: Optional[int]
     department: str
 
-class Job(BaseOrmModel):
+
+class Jobs(BaseOrmModel):
     id: Optional[int]
     job: str

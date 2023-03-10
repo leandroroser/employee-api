@@ -34,6 +34,6 @@ def generate_department_csv(file_path: str) -> None:
 
 if __name__ == "__main__":
     print(f"Generating data...")
-    generate_employee_csv(f"{DATA_PATH}/Employee.csv")
-    generate_job_csv(f"{DATA_PATH}/Job.csv")
-    generate_department_csv(f"{DATA_PATH}/Department.csv")
+    generate_employee_csv(f"{DATA_PATH}/Employees.csv")
+    generate_job_csv(f"{DATA_PATH}/Jobs.csv")
+    generate_department_csv(f"{DATA_PATH}/Departments.csv")

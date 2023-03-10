@@ -4,13 +4,23 @@ from .models import BaseOrmModel
 from .schemas import Base
 from fastavro import reader, parse_schema
 from io import BytesIO
-from minio import Minio
 from datetime import date
-from sqlalchemy.orm import declarative_base
-
+import boto3
+import os
 
 BaseT = TypeVar("BaseT", bound=Base)
 BaseOrmModelT = TypeVar("BaseOrmModelT", bound=BaseOrmModel)
+
+MINIO_ENDPOINT=os.environ["MINIO_ENDPOINT"]
+MINIO_ACCESS_KEY=os.environ["MINIO_ACCESS_KEY"]
+MINIO_SECRET_KEY=os.environ["MINIO_SECRET_KEY"]
+BUCKET_NAME="backup"
+
+s3 = boto3.resource("s3",
+    endpoint_url=MINIO_ENDPOINT,
+    aws_access_key_id=MINIO_ACCESS_KEY,
+    aws_secret_access_key=MINIO_SECRET_KEY)
+
 
 class Connector(Generic[BaseT, BaseOrmModelT]):
     def __init__(self, db_session: Session, entity: Type[BaseT], domain: Type[BaseOrmModelT]):
@@ -22,12 +32,16 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
         return self.domain.from_orm(entity)
 
     def convert_domain_to_db(self, domain: BaseOrmModelT) -> BaseT:
-        return self.entity(**domain.dict())
+        return self.entity(**domain.dict_for_model)
 
     def write(self, obj: BaseOrmModelT):
         db_obj = self.convert_domain_to_db(obj)
-        self.db_session.add(db_obj)
-        self.db_session.commit()
+        try:
+            self.db_session.add(db_obj)
+            self.db_session.commit()
+        except:
+            self.db_session.rollback()
+            raise
 
     def read_all(self) -> List[BaseOrmModelT]:
         db_objs = self.db_session.query(self.entity).all()
@@ -40,24 +54,41 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
     def update(self, obj: BaseOrmModelT):
         db_obj = self.db_session.query(self.entity).filter_by(id=obj.id).first()
         if db_obj:
-            for key, value in obj.dict(exclude_unset=True).items():
-                setattr(db_obj, key, value)
-            self.db_session.commit()
+            try:
+                for key, value in obj.dict(exclude_unset=True).items():
+                    setattr(db_obj, key, value)
+                self.db_session.commit()
+            except:
+                self.db_session.rollback()
+                raise
 
     def delete(self, id: int):
         db_obj = self.db_session.query(self.entity).filter_by(id=id).first()
         if db_obj:
-            self.db_session.delete(db_obj)
+            try:
+                self.db_session.delete(db_obj)
+                self.db_session.commit()
+            except:
+                self.db_session.rollback()
+                raise
+            
+    def delete_all(self, entity: BaseT):
+        try:
+            self.db_session.query(entity).delete()
             self.db_session.commit()
+        except:
+            self.db_session.rollback()
+            raise
 
-    def restore_from_avro(self, bucket_name: str, date: date):
-        client = Minio("minio:9000", access_key="minio", secret_key="minio", secure=False)
-        schema_file_name = f"{self.entity.__tablename__}.avsc"
-        schema_file = client.get_object(bucket_name, schema_file_name)
-        schema = parse_schema(schema_file.read())
-        backup_file_name = f"{self.entity.__tablename__}_{date}.avro"
-        backup_file = client.get_object(bucket_name, backup_file_name)
-        buffer = BytesIO(backup_file.read())
+    def restore_from_avro(self, bucket_name: str, date: date, entity: Base, domain: any):
+        schema_file_name = f"{entity.__tablename__}.avsc"
+        schema_file = s3.Object(bucket_name, schema_file_name)
+        schema = parse_schema(schema_file.get()["Body"].read())
+        backup_file_name = f"{entity.__tablename__}_{date}.avro"
+        backup_file = s3.Object(bucket_name, backup_file_name)
+        buffer = BytesIO(backup_file.get()["Body"].read())
+        self.delete_all(entity)
         with reader(buffer, parse_schema(schema)) as records:
             for record in records:
-                self.write(self.domain(**record))
+                domain_obj = domain(**record)
+                self.write(domain_obj)
