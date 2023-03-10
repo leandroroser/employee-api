@@ -10,7 +10,7 @@ from src.schemas import (Departments as DepartmentsEntity,
                          Employees as EmployeesEntity,
                          Jobs as JobsEntity)
 from src.connector import Connector
-from bulkboto3 import BulkBoto3
+import boto3
 
 local_data_path=os.environ["LOCAL_DATA_PATH"]
 
@@ -21,14 +21,11 @@ TARGET_BUCKET="backup"
 NUM_TRANSFER_THREADS = 50
 TRANSFER_VERBOSITY = True
  
-bulkboto_agent = BulkBoto3(
-    resource_type="s3",
-    endpoint_url=MINIO_ENDPOINT,
-    aws_access_key_id=MINIO_ACCESS_KEY,
-    aws_secret_access_key=MINIO_SECRET_KEY,
-    max_pool_connections=300,
-    verbose=TRANSFER_VERBOSITY,
-)
+s3 = boto3.client('s3', 
+                  endpoint_url=MINIO_ENDPOINT,
+                  aws_access_key_id=MINIO_ACCESS_KEY,
+                  aws_secret_access_key=MINIO_SECRET_KEY,
+                  use_ssl=False)
 
 
 def read_csv_file(file_path):
@@ -65,6 +62,6 @@ if __name__ == "__main__":
     create_table(session, JobsEntity, Jobs)
     create_table(session, DepartmentsEntity, Departments)
 
-    bulkboto_agent.create_new_bucket(bucket_name=TARGET_BUCKET)
+    s3.create_bucket(Bucket=TARGET_BUCKET)
     
     print("Done!")
