@@ -58,7 +58,7 @@ async def counts_quarter() -> JSONResponse:
     merged = merged.merge(jobs, left_on="job_id", right_on="id")
     merged = pd.concat([merged.loc[:, ["department", "job"]], pd.get_dummies(merged["quarter"])], axis=1)
     merged = merged.groupby(["department", "job"]).sum().reset_index()
-    merged = merged.sort_values(["department", "job"])
+    merged.sort_values(["department", "job"],  inplace=True)
     return merged.to_dict()
 
 
@@ -74,6 +74,7 @@ async def higher_than_average() -> JSONResponse:
     result= merged.loc[:, ["department_id", "department"]]
     result = result.groupby("department").value_counts().reset_index()
     result.columns = ["department", "id", "total"]
+    result.sort_values("total", ascending=False, inplace=True)
     return result.loc[result.total > result.total.mean(), :].to_dict()
 
 
