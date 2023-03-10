@@ -2,23 +2,20 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from fastapi.responses import JSONResponse
-from datetime import date
 from .src.connector import Connector
-import uvicorn
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from src.connector import Connector
 from src.models import (Employees, 
                         Jobs,
                         Departments)
 from src.schemas import (Departments as DepartmentsEntity, 
                          Employees as EmployeesEntity,
                          Jobs as JobsEntity)
-from src.connector import Connector
 import os
 from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
-
 
 load_dotenv()
 
@@ -43,13 +40,45 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/status", tags=["status"])
 def status() -> JSONResponse:
     return {"status": "I am up"}
 
 
+@app.get("/counts_quarter")
+async def counts_quarter() -> JSONResponse:
+    employees = pd.read_sql_query('select * from employees',con=conn)
+    jobs = pd.read_sql_query('select * from jobs',con=conn)
+    departments = pd.read_sql_query('select * from departments',con=conn)
+    employees["datetime"] = pd.to_datetime(employees["datetime"])
+    employees["quarter"] = employees["datetime"].dt.quarter
+    employees = employees.loc[employees["datetime"].dt.year == 2021, :]
+    merged = employees.merge(departments, left_on="department_id", right_on="id")
+    merged = merged.merge(jobs, left_on="job_id", right_on="id")
+    merged = pd.concat([merged.loc[:, ["department", "job"]], pd.get_dummies(merged["quarter"])], axis=1)
+    merged = merged.groupby(["department", "job"]).sum().reset_index()
+    merged = merged.sort_values(["department", "job"])
+    return merged.to_dict()
+
+
+@app.get("/higher_than_average")
+async def higher_than_average() -> JSONResponse:
+    employees = pd.read_sql_query('select * from employees',con=conn)
+    jobs = pd.read_sql_query('select * from jobs',con=conn)
+    departments = pd.read_sql_query('select * from departments',con=conn)
+    employees["datetime"] = pd.to_datetime(employees["datetime"])
+    employees = employees.loc[employees["datetime"].dt.year == 2021, :]
+    merged = employees.merge(departments, left_on="department_id", right_on="id")
+    merged = merged.merge(jobs, left_on="job_id", right_on="id")
+    result= merged.loc[:, ["department_id", "department"]]
+    result = result.groupby("department").value_counts().reset_index()
+    result.columns = ["department", "id", "total"]
+    return result.loc[result.total > result.total.mean(), :].to_dict()
+
+
 @app.get("/{table}", tags=["table"])
-async def read_table(table: str):
+async def read_table(table: str) -> JSONResponse:
     if table not in ["employees", "departments", "jobs"]:
         raise HTTPException(status_code=404, detail="Table not found")
     table = table.capitalize()
@@ -57,65 +86,23 @@ async def read_table(table: str):
     rows = connector.read_all()
     return rows
 
+
 @app.post("/{table}", tags=["table"])
-async def create_table(table: str, rows: List[dict]):
+async def create_table(table: str, rows: List[dict]) -> JSONResponse:
     if table not in ["employees", "departments", "jobs"]:
         raise HTTPException(status_code=404, detail="Table not found")
     if not 0 < len(rows) <= 1000:
         raise HTTPException(status_code=400, detail="Invalid batch size")
     table = table.capitalize()
     connector = Connector(session, globals()[table + "Entity"], globals()[table])
-    connector.write(rows)
-
-"""
-@app.put("/{table}", tags=["table"])
-async def put_table(table: str, rows: List[dict]):
-    raise HTTPException(status_code=405, detail="Not allowed response")
-
-
-@app.delete("/{table}", tags=["table"])
-async def delete_table(table: str, rows: List[dict]):
-    raise HTTPException(status_code=405, detail="Not allowed response")
-"""
+    connector.write_all([connector.domain(**elem) for elem in rows])
+    
 
 @app.get("/restore_data/{table}/{date}")
-async def restore_data(table: str, date: str):
+async def restore_data(table: str, date: str) -> JSONResponse:
     if table not in ["employees", "departments", "jobs"]:
         raise HTTPException(status_code=404, detail="Table not found")
     table = table.capitalize()
     connector = Connector(session, globals()[table + "Entity"], globals()[table])
     connector.restore_from_avro(table, date, globals()[table + "Entity"], globals()[table])
     return {"message": f"{table} data for {date} has been restored successfully"}
-
-@app.get("/counts_quarter")
-async def counts_quarter():
-    employees = pd.read_sql_query('select * from Employees',con=conn)
-    jobs = pd.read_sql_query('select * from Jobs',con=conn)
-    departments = pd.read_sql_query('select * from Departments',con=conn)
-    employees["datetime"] = pd.to_datetime(employees.datetime)
-    employees["quarter"] = employees.datetime.dt.quarter
-    employees = employees.loc[employees.datetime.dt.year == 2021, :]
-    merged = employees.merge(departments, left_on="department_id", right_on="id")
-    merged = merged.merge(jobs, left_on="job_id", right_on="id")
-    merged = pd.concat([merged.loc[:, ["department", "job"]], pd.get_dummies(merged["quarter"])], axis=1)
-    merged = merged.groupby(["department", "job"]).sum().reset_index()
-    merged = merged.sort_values(["department", "job"])
-    return merged.to_json(orient="records")
-
-@app.get("/higher_than_average")
-async def counts_quarter():
-    employees = pd.read_sql_query('select * from Employees',con=conn)
-    jobs = pd.read_sql_query('select * from Jobs',con=conn)
-    departments = pd.read_sql_query('select * from Departments',con=conn)
-    employees["datetime"] = pd.to_datetime(employees.datetime)
-    employees = employees.loc[employees.datetime.dt.year == 2021, :]
-    merged = employees.merge(departments, left_on="department_id", right_on="id")
-    merged = merged.merge(jobs, left_on="job_id", right_on="id")
-    result= merged.loc[:, ["department_id", "department"]]
-    result = result.groupby("department").value_counts().reset_index()
-    result.columns = ["department", "id", "total"]
-    return result.loc[result.total > result.total.mean(), :].to_json(orient="records")
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

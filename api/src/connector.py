@@ -30,7 +30,7 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
         self.db_session = db_session
         self.entity = entity
         self.domain = domain
-        
+    
     def convert_db_to_domain(self, entity: BaseT) -> BaseOrmModelT:
         return self.domain.from_orm(entity)
 
@@ -45,6 +45,10 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
         except:
             self.db_session.rollback()
             raise
+    
+    def write_all(self, obj: List[BaseOrmModelT]):
+        for elem in obj:
+            self.write(elem)
 
     def read_all(self) -> List[BaseOrmModelT]:
         db_objs = self.db_session.query(self.entity).all()
