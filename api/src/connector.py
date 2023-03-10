@@ -4,7 +4,6 @@ from .models import BaseOrmModel
 from .schemas import Base
 from fastavro import reader, parse_schema
 from io import BytesIO
-from datetime import date
 import boto3
 import os
 from dotenv import load_dotenv
@@ -87,10 +86,10 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
             self.db_session.rollback()
             raise
 
-    def restore_from_avro(self, date: str, entity: Base, domain: any):
+    def restore_from_avro(self, date: str, entity: Base, domain: BaseOrmModelT):
         schema_file_name = f"{domain.__name__}.avsc"
         schema_file = s3.Object(TARGET_BUCKET, schema_file_name)
-        schema_data = schema_file.get()["Body"].read().encode('utf-8')
+        schema_data = schema_file.get()["Body"].read()
         schema = parse_schema(schema_data)
         backup_file_name = f"{domain.__name__}_{date}.avro"
         backup_file = s3.Object(TARGET_BUCKET, backup_file_name)

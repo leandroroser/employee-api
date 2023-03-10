@@ -105,5 +105,5 @@ async def restore_data(table: str, date: str) -> JSONResponse:
         raise HTTPException(status_code=404, detail="Table not found")
     table = table.capitalize()
     connector = Connector(session, globals()[table + "Entity"], globals()[table])
-    connector.restore_from_avro(table, date, globals()[table + "Entity"], globals()[table])
+    connector.restore_from_avro(date, globals()[table + "Entity"], globals()[table])
     return {"message": f"{table} data for {date} has been restored successfully"}
