@@ -29,7 +29,7 @@ make start
 
 3. Navigate to http://localhost:8000/docs to access the Swagger UI and interact with the API endpoints.
 
-4. To interact with the MinIO object storage service used in this project, you can access the MinIO UI by visiting http://localhost:9001 in your web browser. The MinIO UI provides a web-based user interface that allows you to browse, upload, and manage files stored in your MinIO instance.
+4. To interact with the MinIO object storage service used in this project, you can access the MinIO UI by visiting http://localhost:9001 in your web browser. User/Pass: minio/minio1234. The MinIO UI provides a web-based user interface that allows you to browse, upload, and manage files stored in your MinIO instance.
 
 ### API Endpoints
 

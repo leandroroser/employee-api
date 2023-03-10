@@ -17,7 +17,7 @@ BaseOrmModelT = TypeVar("BaseOrmModelT", bound=BaseOrmModel)
 MINIO_ENDPOINT=os.environ["MINIO_ENDPOINT"]
 MINIO_ACCESS_KEY=os.environ["MINIO_ACCESS_KEY"]
 MINIO_SECRET_KEY=os.environ["MINIO_SECRET_KEY"]
-BUCKET_NAME="backup"
+TARGET_BUCKET=os.environ["BACKUP_BUCKET"]
 
 s3 = boto3.resource("s3",
     endpoint_url=MINIO_ENDPOINT,
@@ -85,12 +85,14 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
 
     def restore_from_avro(self, bucket_name: str, date: str, entity: Base, domain: any):
         schema_file_name = f"{domain.__name__}.avsc"
-        schema_file = s3.Object(bucket_name, schema_file_name)
+        schema_file = s3.Object(TARGET_BUCKET, schema_file_name)
         schema = parse_schema(schema_file.get()["Body"].read())
         backup_file_name = f"{domain.__name__}_{date}.avro"
-        backup_file = s3.Object(bucket_name, backup_file_name)
+        backup_file = s3.Object(TARGET_BUCKET, backup_file_name)
         buffer = BytesIO(backup_file.get()["Body"].read())
+        print(f"Deleting table for {domain.__name__}")
         self.delete_all(entity)
+        print("Writing data")
         with reader(buffer, parse_schema(schema)) as records:
             for record in records:
                 domain_obj = domain(**record)
