@@ -17,6 +17,7 @@ from src.connector import Connector
 import os
 from dotenv import load_dotenv
 import pandas as pd
+import psycopg2
 
 
 load_dotenv()
@@ -30,6 +31,7 @@ db_uri=f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
 engine = create_engine(db_uri)
 Session = sessionmaker(bind=engine)
 session = Session()
+conn = psycopg2.connect(database=db, user=user, password=password, host=host, port= port)
 
 app = FastAPI(title="Employee management system")
 
@@ -87,9 +89,9 @@ async def restore_data(table: str, date: str):
 
 @app.get("/counts_quarter")
 async def counts_quarter():
-    employees = pd.read_sql_query('select * from Employees',con=engine)
-    jobs = pd.read_sql_query('select * from Jobs',con=engine)
-    departments = pd.read_sql_query('select * from Departments',con=engine)
+    employees = pd.read_sql_query('select * from Employees',con=conn)
+    jobs = pd.read_sql_query('select * from Jobs',con=conn)
+    departments = pd.read_sql_query('select * from Departments',con=conn)
     employees["datetime"] = pd.to_datetime(employees.datetime)
     employees["quarter"] = employees.datetime.dt.quarter
     employees = employees.loc[employees.datetime.dt.year == 2021, :]
@@ -102,9 +104,9 @@ async def counts_quarter():
 
 @app.get("/higher_than_average")
 async def counts_quarter():
-    employees = pd.read_sql_query('select * from Employees',con=engine)
-    jobs = pd.read_sql_query('select * from Jobs',con=engine)
-    departments = pd.read_sql_query('select * from Departments',con=engine)
+    employees = pd.read_sql_query('select * from Employees',con=conn)
+    jobs = pd.read_sql_query('select * from Jobs',con=conn)
+    departments = pd.read_sql_query('select * from Departments',con=conn)
     employees["datetime"] = pd.to_datetime(employees.datetime)
     employees = employees.loc[employees.datetime.dt.year == 2021, :]
     merged = employees.merge(departments, left_on="department_id", right_on="id")

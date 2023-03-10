@@ -47,12 +47,12 @@ make start
 
 ### Technologies Used
 
-- FastAPI: a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python type hints.
-- SQLAlchemy: a powerful SQL toolkit and Object-Relational Mapping (ORM) library for Python.
-- uvicorn: a lightning-fast ASGI server implementation, using uvloop and httptools.
-- docker-compose: a tool for defining and running multi-container Docker applications.
-- PostgreSQL: a powerful, open-source relational database system.
-- MinIO: a high-performance, distributed object storage system.
+- **FastAPI**: a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python type hints.
+- **SQLAlchemy**: a powerful SQL toolkit and Object-Relational Mapping (ORM) library for Python.
+- **uvicorn**: a lightning-fast ASGI server implementation, using uvloop and httptools.
+- **docker-compose**: a tool for defining and running multi-container Docker applications.
+- **PostgreSQL**: a powerful, open-source relational database system.
+- **MinIO**: a high-performance, distributed object storage system.
 
 
 ### Examples
