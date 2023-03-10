@@ -41,6 +41,9 @@ make start
 
 `GET /restore_data/{table}/{date}`: Restores data from MinIO for the specified table and date. Valid table names are employees, departments, and jobs. The date should be in YYYY-MM-DD format.
 
+`GET /counts_quarter`: Number of employees hired for each job and department in 2021 divided by quarter. The table must be ordered alphabetically by department and job.
+
+`GET /higher_than_average`: List of ids, name and number of employees hired of each department that hired more employees than the mean of employees hired in 2021 for all the departments, ordered by the number of employees hired (descending).
 
 ### Technologies Used
 
