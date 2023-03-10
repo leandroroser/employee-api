@@ -18,7 +18,7 @@ FROM base as api
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 COPY ./api /app/api
-COPY ./data /app/data
+COPY ./api-data /app/data
 
 
 FROM base as backup

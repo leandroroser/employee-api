@@ -1,11 +1,10 @@
 from typing import Optional,Dict,Any
 from pydantic import BaseModel
+from datetime import datetime
 
 PayloadDict = Dict[str, Any]
 
 class BaseOrmModel(BaseModel):
-    id: Optional[int]
-
     class Config:
         orm_mode = True
 
@@ -15,17 +14,20 @@ class BaseOrmModel(BaseModel):
 
 
 class Employee(BaseOrmModel):
+    id: Optional[int]
     name: str
-    age: int
+    datetime: datetime
     job_id: int
     department_id: int
 
 
 class Department(BaseOrmModel):
+    id: Optional[int]
     name: str
     location: str
 
 
 class Job(BaseOrmModel):
+    id: Optional[int]
     title: str
     salary: int

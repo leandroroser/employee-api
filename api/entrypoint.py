@@ -3,12 +3,11 @@ import pandas as pd
 from sqlalchemy import create_engine
 from src.models import Employee, Job, Department
 from src.schemas import Base
-from src.schemas import (Department as DepartmentSchema, 
-                         Employee as EmployeeSchema,
-                         Job as JobSchema)
+from src.schemas import (Department as DepartmentEntity, 
+                         Employee as EmployeeEntity,
+                         Job as JobEntity)
 
 from src.connector import Connector
-from data_generator import generate_employee_csv,generate_job_csv,generate_department_csv
 
 
 local_data_path=os.environ["LOCAL_DATA_PATH"]
@@ -16,11 +15,11 @@ local_data_path=os.environ["LOCAL_DATA_PATH"]
 def read_csv_file(file_path):
     return pd.read_csv(file_path)
 
-def create_table(engine, entity, schema):
-    connector = Connector(engine, entity, schema)
+def create_table(engine, entity, domain):
+    connector = Connector(engine, entity, domain)
     table_name = entity.__name__
     print(f"Creating {table_name}s...")
-    table = read_csv_file(f"{local_data_path}/{table_name}s.csv")
+    table = read_csv_file(f"{local_data_path}/{table_name}.csv")
     for _, row in table.iterrows():
         record = entity(**row.to_dict())
         connector.write(record)
@@ -39,8 +38,8 @@ if __name__ == "__main__":
     engine = create_engine(db_uri)
 
     print(f"Data to db...")
-    create_table(engine, Employee, EmployeeSchema)
-    create_table(engine, Job, JobSchema)
-    create_table(engine, Department, DepartmentSchema)
+    create_table(engine, EmployeeEntity, Employee)
+    create_table(engine, JobEntity, Job)
+    create_table(engine, DepartmentEntity, Department)
 
     print("Done!")

@@ -34,9 +34,10 @@ services:
       - LOCAL_DATA_PATH=/app/data
     volumes:
       - api-data:/app/data
-    #entrypoint: ["python", "/app/api/entrypoint.py"]
     command: >
-      bash -c "uvicorn api.main:app --port 8000 --host 0.0.0.0"
+      bash -c "export PYTHONPATH=/app/api &&
+            python -m entrypoint &&
+            uvicorn api.main:app --port 8000 --host 0.0.0.0 --reload"
     ports:
       - 8000:8000
     links:
