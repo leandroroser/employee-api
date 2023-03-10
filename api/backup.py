@@ -10,11 +10,15 @@ from src.models import Employees, Jobs, Departments
 from src.schemas import (Departments as DepartmentsEntity,
                          Employees as EmployeesEntity,
                          Jobs as JobsEntity)
+import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 MINIO_ENDPOINT=os.environ["MINIO_ENDPOINT"]
 MINIO_ACCESS_KEY=os.environ["MINIO_ACCESS_KEY"]
 MINIO_SECRET_KEY=os.environ["MINIO_SECRET_KEY"]
-TARGET_BUCKET="backup"
+TARGET_BUCKET=os.environ["BACKUP_BUCKET"]
 NUM_TRANSFER_THREADS = 50
 TRANSFER_VERBOSITY = True
 USER = os.environ["POSTGRES_USER"]
@@ -37,13 +41,13 @@ def backup_to_avro(engine, entity, domain):
     backup_filename = f"{table_name}_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.avro"
     schema_filename = f"{table_name}.avsc"
 
-    data = connector.read_all()
-    schema = connector.model.avro_schema()
+    data = [x.dict() for x in connector.read_all()]
+    schema = domain.avro_schema()
     data_buffer = BytesIO()
     writer(data_buffer, schema, data)
     data_buffer.seek(0)
 
-    schema_buffer = BytesIO(schema.to_json().encode("utf-8"))
+    schema_buffer = BytesIO(json.dumps(schema).encode("utf-8"))
     schema_buffer.seek(0)
 
     try:

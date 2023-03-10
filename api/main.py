@@ -15,6 +15,9 @@ from src.schemas import (Departments as DepartmentsEntity,
                          Jobs as JobsEntity)
 from src.connector import Connector
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 user=os.environ["POSTGRES_USER"]
 password=os.environ["POSTGRES_PASSWORD"]
@@ -72,12 +75,12 @@ async def delete_table(table: str, rows: List[dict]):
 
 @app.get("/restore_data/{table}/{date}")
 async def restore_data(table: str, date: date):
-    if table not in ["employee", "department", "job"]:
+    if table not in ["employees", "departments", "jobs"]:
         raise HTTPException(status_code=404, detail="Table not found")
-    connector = Connector(globals()[table.capitalize()])
+    table = table.capitalize()
+    connector = Connector(session, globals()[table + "Entity"], globals()[table])
     connector.restore_from_avro(table, date)
     return {"message": f"{table} data for {date} has been restored successfully"}
-
 
 
 if __name__ == "__main__":

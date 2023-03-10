@@ -1,10 +1,11 @@
 from typing import Optional,Dict,Any
-from pydantic import BaseModel
+#from pydantic import BaseModel
 from datetime import datetime
+from pydantic_avro.base import AvroBase
 
 PayloadDict = Dict[str, Any]
 
-class BaseOrmModel(BaseModel):
+class BaseOrmModel(AvroBase):
     class Config:
         orm_mode = True
 

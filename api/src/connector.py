@@ -7,6 +7,9 @@ from io import BytesIO
 from datetime import date
 import boto3
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BaseT = TypeVar("BaseT", bound=Base)
 BaseOrmModelT = TypeVar("BaseOrmModelT", bound=BaseOrmModel)
@@ -80,11 +83,11 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
             self.db_session.rollback()
             raise
 
-    def restore_from_avro(self, bucket_name: str, date: date, entity: Base, domain: any):
-        schema_file_name = f"{entity.__tablename__}.avsc"
+    def restore_from_avro(self, bucket_name: str, date: str, entity: Base, domain: any):
+        schema_file_name = f"{domain.__name__}.avsc"
         schema_file = s3.Object(bucket_name, schema_file_name)
         schema = parse_schema(schema_file.get()["Body"].read())
-        backup_file_name = f"{entity.__tablename__}_{date}.avro"
+        backup_file_name = f"{domain.__name__}_{date}.avro"
         backup_file = s3.Object(bucket_name, backup_file_name)
         buffer = BytesIO(backup_file.get()["Body"].read())
         self.delete_all(entity)

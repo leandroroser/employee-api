@@ -1,4 +1,3 @@
-from typing import List
 import csv
 from faker import Faker
 import pytz

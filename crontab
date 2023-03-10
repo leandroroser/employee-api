@@ -1,1 +1,2 @@
-$CRON_SCHEDULE root python /app/api/backup_tables_to_minio.py
+* * * * * echo "Hello world" `date` >> /var/log/cron.log 2>&1
+* * * * * /usr/local/bin/python3 /app/api/backup.py >> /var/log/cron.log 2>&1

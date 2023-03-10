@@ -1,4 +1,5 @@
 FROM python:3.10.6-slim-buster as base
+WORKDIR /app
 
 ENV PYTHONUNBUFFERED=0 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -7,11 +8,10 @@ ENV PYTHONUNBUFFERED=0 \
 
 RUN apt-get update -y && \
     apt-get upgrade -y && \
-    apt-get -y install gcc libpq-dev python-dev && \
+    apt-get -y install gcc libpq-dev python-dev nano && \
     pip3 install --upgrade pip
 
-WORKDIR /app
-
+ADD .env  .
 
 FROM base as api
 
@@ -31,8 +31,8 @@ COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 COPY ./api /app/api
 
-COPY crontab /etc/cron.d/backup-cron
-RUN chmod 0644 /etc/cron.d/backup-cron
+COPY crontab /opt/hello/backup.cronjob
+RUN chmod 0644 /opt/hello/backup.cronjob && \
+	crontab /opt/hello/backup.cronjob
 RUN touch /var/log/cron.log
-
-CMD ["cron", "-f"]
+CMD (cron -f &) && tail -f /var/log/cron.log

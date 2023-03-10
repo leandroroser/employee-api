@@ -11,13 +11,16 @@ from src.schemas import (Departments as DepartmentsEntity,
                          Jobs as JobsEntity)
 from src.connector import Connector
 import boto3
+from dotenv import load_dotenv
+
+load_dotenv()
 
 local_data_path=os.environ["LOCAL_DATA_PATH"]
 
 MINIO_ENDPOINT=os.environ["MINIO_ENDPOINT"]
 MINIO_ACCESS_KEY=os.environ["MINIO_ACCESS_KEY"]
 MINIO_SECRET_KEY=os.environ["MINIO_SECRET_KEY"]
-TARGET_BUCKET="backup"
+TARGET_BUCKET=os.environ["BACKUP_BUCKET"]
 NUM_TRANSFER_THREADS = 50
 TRANSFER_VERBOSITY = True
  
@@ -37,9 +40,9 @@ def create_table(engine, entity, domain):
     print(f"Reading {table_name}.csv...")
     table = read_csv_file(f"{local_data_path}/{table_name}.csv")
     for _, row in table.iterrows():
-        print("--------HERE---------")
-        print(row.to_dict())
-        record = domain(**row.to_dict())
+        data = row.to_dict()
+        print(data)
+        record = domain(**data)
         connector.write(record)
 
 

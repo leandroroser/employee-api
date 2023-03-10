@@ -7,10 +7,10 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=employees
-      - POSTGRES_HOST=db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
     ports:
       - 5432:5432  
     healthcheck:
@@ -20,18 +20,28 @@ services:
       retries: 5
     networks:
     - appnet
+  
+  minio:
+    image: minio/minio
+    restart: always
+    environment:
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio-data:/data
+    networks:
+    - appnet
+    command: server --console-address ":9001" /data
 
   api:
     build:
       context: .
       target: api
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=employees
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
-      - LOCAL_DATA_PATH=/app/data
+    env_file:
+      - .env
     volumes:
       - api-data:/app/data
     command: >
@@ -42,6 +52,7 @@ services:
       - 8000:8000
     links:
       - db
+      - minio
     depends_on:
       db:
         condition: service_healthy
@@ -53,23 +64,6 @@ services:
     networks:
     - appnet
 
-  minio:
-    image: minio/minio
-    restart: always
-    depends_on:
-      - api
-    environment:
-      MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio1234
-    ports:
-      - 9000:9000
-      - 9001:9001
-    volumes:
-      - minio-data:/data
-    networks:
-    - appnet
-    command: server --console-address ":9001" /data
-
   backup:
     build:
       context: .
@@ -78,15 +72,8 @@ services:
       - db
       - minio
       - api
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: employees
-      MINIO_ENDPOINT: http://minio:9000
-      MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio1234
-      BACKUP_BUCKET: backups
-      BACKUP_SCHEDULE: "0/5 0 0 ? * * *"
+    env_file:
+      - .env
     networks:
     - appnet
 
