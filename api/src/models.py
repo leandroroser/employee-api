@@ -23,11 +23,8 @@ class Employee(BaseOrmModel):
 
 class Department(BaseOrmModel):
     id: Optional[int]
-    name: str
-    location: str
-
+    department: str
 
 class Job(BaseOrmModel):
     id: Optional[int]
-    title: str
-    salary: int
+    job: str
