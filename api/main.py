@@ -96,6 +96,7 @@ async def create_table(table: str, rows: List[dict]) -> JSONResponse:
     table = table.capitalize()
     connector = Connector(session, globals()[table + "Entity"], globals()[table])
     connector.write_all([connector.domain(**elem) for elem in rows])
+    return {"status":"ok"}
     
 
 @app.get("/restore_data/{table}/{date}")

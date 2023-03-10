@@ -87,17 +87,18 @@ class Connector(Generic[BaseT, BaseOrmModelT]):
             self.db_session.rollback()
             raise
 
-    def restore_from_avro(self, bucket_name: str, date: str, entity: Base, domain: any):
+    def restore_from_avro(self, date: str, entity: Base, domain: any):
         schema_file_name = f"{domain.__name__}.avsc"
         schema_file = s3.Object(TARGET_BUCKET, schema_file_name)
-        schema = parse_schema(schema_file.get()["Body"].read())
+        schema_data = schema_file.get()["Body"].read().encode('utf-8')
+        schema = parse_schema(schema_data)
         backup_file_name = f"{domain.__name__}_{date}.avro"
         backup_file = s3.Object(TARGET_BUCKET, backup_file_name)
         buffer = BytesIO(backup_file.get()["Body"].read())
         print(f"Deleting table for {domain.__name__}")
         self.delete_all(entity)
         print("Writing data")
-        with reader(buffer, parse_schema(schema)) as records:
+        with reader(buffer, schema) as records:
             for record in records:
                 domain_obj = domain(**record)
                 self.write(domain_obj)

@@ -3,21 +3,20 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Departments(Base):
+class BaseSchema(Base):
+    __abstract__ = True
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    
+class Departments(BaseSchema):
     __tablename__ = "departments"
-    id = Column(Integer, primary_key=True, index=True)
     department = Column(String, index=True)
 
-
-class Jobs(Base):
+class Jobs(BaseSchema):
     __tablename__ = "jobs"
-    id = Column(Integer, primary_key=True, index=True)
     job = Column(String, index=True)
 
-
-class Employees(Base):
+class Employees(BaseSchema):
     __tablename__ = "employees"
-    id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     datetime = Column(String, index=True)
     department_id = Column(Integer)

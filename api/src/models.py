@@ -6,6 +6,7 @@ from pydantic_avro.base import AvroBase
 PayloadDict = Dict[str, Any]
 
 class BaseOrmModel(AvroBase):
+    id: Optional[int]
     class Config:
         orm_mode = True
 
@@ -14,18 +15,13 @@ class BaseOrmModel(AvroBase):
         return self.dict(by_alias=False)
 
 class Employees(BaseOrmModel):
-    id: Optional[int]
     name: str
     datetime: datetime
     job_id: int
     department_id: int
-
-
+    
 class Departments(BaseOrmModel):
-    id: Optional[int]
     department: str
-
-
+    
 class Jobs(BaseOrmModel):
-    id: Optional[int]
     job: str
