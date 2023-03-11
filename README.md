@@ -17,7 +17,7 @@ git clone https://github.com/example/employee-management-system.git
 1. Generate data:
 
 ```bash
-cd employee-management-system
+cd employee-api
 pip install pyenv
 pyenv install 3.10.6
 pyenv virtualenv 3.10.6 testapi 
