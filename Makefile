@@ -10,3 +10,7 @@ test:
 clean:
 	docker-compose down
 	docker-compose rm -f
+
+test:
+	pytest .
+

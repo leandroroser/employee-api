@@ -5,11 +5,11 @@ from fastapi.responses import JSONResponse
 from .src.connector import Connector
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.connector import Connector
-from src.models import (Employees, 
+from .src.connector import Connector
+from .src.models import (Employees, 
                         Jobs,
                         Departments)
-from src.schemas import (Departments as DepartmentsEntity, 
+from .src.schemas import (Departments as DepartmentsEntity, 
                          Employees as EmployeesEntity,
                          Jobs as JobsEntity)
 import os
