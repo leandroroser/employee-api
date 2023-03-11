@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -10,14 +11,16 @@ class BaseSchema(Base):
 class Departments(BaseSchema):
     __tablename__ = "departments"
     department = Column(String, index=True)
-
+    employees = relationship("Employees", backref="department")
+    
 class Jobs(BaseSchema):
     __tablename__ = "jobs"
     job = Column(String, index=True)
-
+    employees = relationship("Employees", backref="job")
+    
 class Employees(BaseSchema):
     __tablename__ = "employees"
     name = Column(String, index=True)
     datetime = Column(String, index=True)
-    department_id = Column(Integer)
-    job_id = Column(Integer)
+    department_id = Column(Integer, ForeignKey('departments.id'))
+    job_id = Column(Integer, ForeignKey('jobs.id'))

@@ -61,9 +61,9 @@ if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
 
     print(f"Data to db...")
-    create_table(session, EmployeesEntity, Employees)
     create_table(session, JobsEntity, Jobs)
     create_table(session, DepartmentsEntity, Departments)
+    create_table(session, EmployeesEntity, Employees)
 
     s3.create_bucket(Bucket=TARGET_BUCKET)
     
